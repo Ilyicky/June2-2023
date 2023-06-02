@@ -25,7 +25,26 @@ class PagesController extends BaseController
 
     public function virtualmap()
     {
-        return view ('virtualmap');
+        $lot = '1'; // Replace with the actual value you want to switch on
+
+        switch ($lot) {
+            case '1':
+                $lotModel = new LotModel();
+                $lots = $lotModel->findAll();
+                break;
+            case '2':
+                $lotModel = new LotModel();
+                $lots = $lotModel->findAll();
+                break;
+            default:
+                return redirect()->back()->withInput()->with('error', 'Lot number not found.');
+        }
+
+        $data = [
+            'lots' => $lots,
+        ]; 
+
+        return view ('virtualmap', $data);
     }
 
 
@@ -169,20 +188,12 @@ class PagesController extends BaseController
     }
 
 
-    public function reports()
+    public function reports($lotId)
     {
         $lotModel = new LotModel();
-        $totalArea = $lotModel->selectSum('size_of_area', 'Area')->get()->getRow()->Area;
-        $totalLot = $lotModel->selectSum('lot_no', 'Lot')->get()->getRow()->Lot;
-        $totalReports = $lotModel->selectSum('lot_no', 'Reports')->get()->getRow()->Reports;
-        $totalNoReports = $lotModel->selectSum('lot_no', 'NoReports')->get()->getRow()->NoReports;
-        $data = [
-            'totalArea' => $totalArea,
-            'totalLot' => $totalLot,
-            'totalReports' => $totalReports,
-            'totalNoReports' => $totalNoReports,
-        ];
-
+        $lot = $lotModel->find($lotId);
+        $data['lot'] = $lot;
+        
         return view('reports', $data);
     }
 
